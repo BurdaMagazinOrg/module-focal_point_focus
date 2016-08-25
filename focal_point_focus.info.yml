@@ -1,0 +1,7 @@
+name: Focal Point Focus
+type: module
+description: Adds ImageField Focus functionality to Focal Point
+core: 8.x
+package: Images
+dependencies:
+  - focal_point
