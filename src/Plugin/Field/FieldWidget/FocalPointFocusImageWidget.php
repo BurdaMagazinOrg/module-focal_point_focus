@@ -26,16 +26,41 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
   public static function process($element, FormStateInterface $form_state, $form) {
     $element = parent::process($element, $form_state, $form);
 
+    $item = $element['#value'];
 
     $element['crop_rect'] = [
       '#type' => 'textfield',
       '#title' => t('Crop rectangle'),
       '#element_validate' => [[__CLASS__, 'validateCropRectFormat']],
-      '#description' => t('Coordinates of the crop rectangle "x1,y1,x2,y2".')
+      '#description' => t('Coordinates of the crop rectangle "x1,y1,x2,y2".'),
+      '#default_value' => $item['crop_rect'],
     ];
     $element['#element_validate'][] = [__CLASS__, 'validateValues'];
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function value($element, $input = FALSE, FormStateInterface $form_state) {
+    $return = parent::value($element, $input, $form_state);
+
+    // When an element is loaded, crop_rect needs to be set. During a form
+    // submission the value will already be there.
+    if (isset($return['target_id']) && !isset($return['crop_rect'])) {
+      /** @var \Drupal\file\FileInterface $file */
+      $file = \Drupal::service('entity_type.manager')
+        ->getStorage('file')
+        ->load($return['target_id']);
+      $crop_type = \Drupal::config('focal_point.settings')->get('crop_type');
+      $crop = Crop::findCrop($file->getFileUri(), $crop_type);
+      if ($crop) {
+        $crop_rect = array_map(function ($item) { return $item['value']; }, $crop->focus_crop_coords->getValue());
+        $return['crop_rect'] = join(',', $crop_rect);
+      }
+    }
+    return $return;
   }
 
   /**

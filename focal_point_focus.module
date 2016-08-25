@@ -51,7 +51,7 @@ function focal_point_focus_entity_presave(EntityInterface $entity) {
       if ($value->getType() == 'image' && $entity->hasField($value->getName())) {
         // Loop through all values for this field. Its cardinality might be > 1.
         foreach ($entity->{$value->getName()} as $item) {
-          if (isset($item->crop_rect) && ! empty($item->crop_rect)) {
+          if (isset($item->crop_rect)) {
             $crop_type = \Drupal::config('focal_point.settings')->get('crop_type');
             $crop = \Drupal::service('focal_point.manager')->getCropEntity($item->entity, $crop_type);
             $crop->focus_crop_coords = explode(',', $item->crop_rect);
