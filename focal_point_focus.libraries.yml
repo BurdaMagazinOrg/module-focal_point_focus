@@ -1,0 +1,9 @@
+widget:
+  version: VERSION
+  js:
+    js/jquery.event.drag-2.2/jquery.event.drag-2.2.js: {}
+    js/jquery.event.drag-2.2/jquery.event.drag.live-2.2.js: {}
+    js/focal_point_focus.js: {}
+  css:
+    theme:
+      css/focal_point_focus.css: {}

@@ -27,6 +27,9 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
     $element = parent::process($element, $form_state, $form);
 
     $item = $element['#value'];
+    // prepend the value of $element_selector of focal_point with "crop-" to
+    // be able to find our field with js
+    $element_selector = 'crop-focal-point-' . implode('-', $element['#parents']);
 
     $element['crop_rect'] = [
       '#type' => 'textfield',
@@ -34,6 +37,18 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
       '#element_validate' => [[__CLASS__, 'validateCropRectFormat']],
       '#description' => t('Coordinates of the crop rectangle "x1,y1,x2,y2".'),
       '#default_value' => $item['crop_rect'],
+      '#attributes' => array(
+        'class' => array('focal-point-focus-crop', $element_selector),
+      ),
+      '#attached' => [
+        'library' => ['focal_point_focus/widget'],
+        'drupalSettings' => [
+          'focal_point_focus' => [
+            'width' => $element['width']['#value'],
+            'height' => $element['height']['#value'],
+          ]
+        ],
+      ],
     ];
     $element['#element_validate'][] = [__CLASS__, 'validateValues'];
 

@@ -1,0 +1,14 @@
+.focal-point-focal-outer-rect {
+  position: relative;
+  overflow: hidden;
+}
+
+.focal-point-focal-outer-rect .crop-rect {
+  position: absolute;
+  outline: 1000px solid rgba(255,255,255,.4);
+  pointer-events: none;
+}
+
+.focal-point-indicator {
+  z-index: 100;
+}
