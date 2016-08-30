@@ -1,4 +1,5 @@
 (function($, Drupal) {
+'use strict';
 
   // Drupal behavior.
   Drupal.behaviors.focal_point_focus = {
@@ -61,12 +62,13 @@
       fpf.outerRect.data('start', [fullX, fullY]);
     });
 
-
     this.outerRect.drag(function(ev, dd) {
       var x1, y1, x2, y2;
       [x1, y1] = fpf.outerRect.data('start');
       var fullDeltaX = dd.deltaX / self.width() * settings.width;
       var fullDeltaY = dd.deltaY / self.height() * settings.height;
+
+      // Handle negative delta values (dragging left and/or up)
       if (fullDeltaX > 0) {
         x2 = x1 + fullDeltaX;
       }
@@ -81,12 +83,20 @@
         y2 = y1;
         y1 = y2 + fullDeltaY;
       }
+
+      // Handle dragging out of image boundaries
+      if (x1 < 0) { x1 = 0; }
+      if (y1 < 0) { y1 = 0; }
+      if (x2 > settings.width) { x2 = settings.width; }
+      if (y2 > settings.height) { y2 = settings.height; }
+
       fpf.setCoords(x1, y1, x2, y2);
     });
 
   }
   Drupal.FocalPointFocus.prototype.drawRect = function() {
     var coords = this.field.val().split(',');
+    var x1, y1, x2, y2;
 
     if (4 == coords.length) {
       x1 = coords[0]/this.settings.width * this.outerRect.width();
@@ -110,8 +120,7 @@
   }
 
   Drupal.FocalPointFocus.prototype.setCoords = function(x1,y1,x2,y2) {
-    [x1, y1, x2, y2] = [x1, y1, x2, y2].map(Math.round);
-    this.field.val(x1 + "," + y1 + "," + x2 + "," + y2);
+    this.field.val([x1, y1, x2, y2].map(Math.round).join(','));
     this.drawRect();
   }
 
