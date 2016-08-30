@@ -6,7 +6,7 @@
     attach: function(context, settings) {
       $(".focal-point-focus-crop", context).once('focal-point-hide-crop-field').each(function() {
         if (!$(this).hasClass('error')) {
-          //$(this).closest('.form-item').hide();
+          $(this).closest('.form-item').hide();
         }
       });
 
@@ -16,7 +16,7 @@
         var img = indicator.siblings('img');
         var field = $("." + "crop-" + indicator.attr('data-selector'));
 
-        var fpf = new Drupal.FocalPointFocus(img, field, settings.focal_point_focus);
+        var fpf = new Drupal.FocalPointFocus(img, field, settings.focal_point_focus, indicator);
 
         // Set the position of the indicator on image load and any time the
         // field value changes. We use a bit of hackery to make certain that the
@@ -36,12 +36,13 @@
   };
 
 
-  Drupal.FocalPointFocus = function(img, field, settings) {
+  Drupal.FocalPointFocus = function(img, field, settings, indicator) {
     var self = this;
 
     this.img = img;
     this.field = field;
     this.settings = settings;
+    this.indicator = indicator;
   }
 
   Drupal.FocalPointFocus.prototype.setup = function() {
@@ -52,6 +53,12 @@
       .height(this.img.height());
     this.cropRect = $('<div class="crop-rect"></div>').appendTo(this.outerRect);
     var settings = this.settings;
+
+    // Allow users to double-click the indicator to reveal the focal point form
+    // element.
+    this.indicator.on('dblclick', function() {
+      fpf.field.closest('.form-item').toggle();
+    });
 
     this.outerRect.drag('start', function(ev, dd) {
       self = $(this);
@@ -123,5 +130,4 @@
     this.field.val([x1, y1, x2, y2].map(Math.round).join(','));
     this.drawRect();
   }
-
 })(jQuery, Drupal);
