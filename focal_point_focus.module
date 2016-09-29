@@ -43,7 +43,7 @@ function focal_point_focus_field_widget_form_alter(&$element, FormStateInterface
  *
  * Saves the crop rect values for the image file entity about to be saved.
  */
-function focal_point_focus_entity_presave(EntityInterface $entity) {
+function focal_point_focus_entity_presave(\Drupal\Core\Entity\EntityInterface $entity) {
   // Only worry about entities that are fieldable.
   if ($entity instanceof Drupal\Core\Entity\FieldableEntityInterface) {
     // Loop all the fields and save focal point values for images.

@@ -100,7 +100,11 @@ class FocalPointFocusScaleAndCropImageEffect extends FocalPointScaleAndCropImage
    * crop, which may have been altered in ::applyEffect().
    */
   public function applyCrop(ImageInterface $image, $original_image_size) {
-    $anchor = $this->calculateAnchor($image, $this->crop, $original_image_size);
+    $original_focal_point = $this->getOriginalFocalPoint($this->crop, $this->focalPointManager);
+    $focal_point = $this->transformFocalPoint($image, $original_focal_point);
+
+    $anchor = $this->calculateAnchor($focal_point, $image, $this->crop);
+
     if (!$image->crop($anchor['x'], $anchor['y'], $this->configuration['width'], $this->configuration['height'])) {
       $this->logger->error(
         'Focal point scale and crop failed while scaling and cropping using the %toolkit toolkit on %path (%mimetype, %dimensions, anchor: %anchor)',
