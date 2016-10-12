@@ -52,6 +52,7 @@
       .width(this.img.width())
       .height(this.img.height());
     this.cropRect = $('<div class="crop-rect"></div>').appendTo(this.outerRect);
+    this.drawRect()
     var settings = this.settings;
 
     // Allow users to double-click the indicator to reveal the focal point form
