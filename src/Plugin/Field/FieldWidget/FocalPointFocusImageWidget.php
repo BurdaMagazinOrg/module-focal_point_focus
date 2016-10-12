@@ -36,7 +36,7 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
       '#title' => t('Crop rectangle'),
       '#element_validate' => [[__CLASS__, 'validateCropRectFormat']],
       '#description' => t('Coordinates of the crop rectangle "x1,y1,x2,y2".'),
-      '#default_value' => $item['crop_rect'],
+      '#default_value' => ($item['crop_rect']) ? $item['crop_rect'] : '',
       '#attributes' => array(
         'class' => array('focal-point-focus-crop', $element_selector),
       ),
