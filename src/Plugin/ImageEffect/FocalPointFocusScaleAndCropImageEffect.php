@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\focal_point_focus\Plugin\ImageEffect\FocalPointFocusScaleAndCropImageEffect.
- */
-
 namespace Drupal\focal_point_focus\Plugin\ImageEffect;
 
 use Drupal\Core\Image\ImageInterface;
-use Drupal\crop\CropInterface;
 use Drupal\crop\Entity\Crop;
 use Drupal\focal_point\Plugin\ImageEffect\FocalPointScaleAndCropImageEffect;
 
@@ -30,6 +24,9 @@ class FocalPointFocusScaleAndCropImageEffect extends FocalPointScaleAndCropImage
    */
   protected $crop;
 
+  /**
+   * {@inheritdoc}
+   */
   public function applyEffect(ImageInterface $image) {
     $crop_type = $this->focalPointConfig->get('crop_type');
 
@@ -51,8 +48,8 @@ class FocalPointFocusScaleAndCropImageEffect extends FocalPointScaleAndCropImage
 
     // If we have crop coordinates defined:
     if (!$this->crop->focus_crop_coords->isEmpty()) {
-      // 1. Try cropping the image
-      if (! $this->preFocalPointCrop($image)) {
+      // 1. Try cropping the image.
+      if (!$this->preFocalPointCrop($image)) {
         return FALSE;
       }
       // 2. Adjust the x,y values of the crop entity to match the cropped image.
@@ -65,7 +62,6 @@ class FocalPointFocusScaleAndCropImageEffect extends FocalPointScaleAndCropImage
     // Run the parent effect with the pre cropped image.
     return parent::applyEffect($image);
   }
-
 
   /**
    * {@inheritdoc}
@@ -95,6 +91,8 @@ class FocalPointFocusScaleAndCropImageEffect extends FocalPointScaleAndCropImage
   }
 
   /**
+   * Applies the crop to an image.
+   *
    * This an almost verbatim copy of the parent implementation.
    * Only difference is we are using the crop entity stored in the property
    * crop, which may have been altered in ::applyEffect().

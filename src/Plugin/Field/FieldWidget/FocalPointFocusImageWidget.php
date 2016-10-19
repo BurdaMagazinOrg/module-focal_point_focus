@@ -1,17 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\focal_point_focus\Plugin\Field\FieldWidget\FocalPointFocusImageWidget.
- */
-
 namespace Drupal\focal_point_focus\Plugin\Field\FieldWidget;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\crop\Entity\Crop;
 use Drupal\focal_point\Plugin\Field\FieldWidget\FocalPointImageWidget;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\image\Plugin\Field\FieldWidget\ImageWidget;
 
 /**
  * Extension of focal_point's FocalPointImageWidget adding a crop area.
@@ -27,8 +21,9 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
     $element = parent::process($element, $form_state, $form);
 
     $item = $element['#value'];
-    // prepend the value of $element_selector of focal_point with "crop-" to
-    // be able to find our field with js
+    /* prepend the value of $element_selector of focal_point with "crop-" to
+     * be able to find our field with js
+     */
     $element_selector = 'crop-focal-point-' . implode('-', $element['#parents']);
 
     $element['crop_rect'] = [
@@ -46,7 +41,7 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
           'focal_point_focus' => [
             'width' => $element['width']['#value'],
             'height' => $element['height']['#value'],
-          ]
+          ],
         ],
       ],
     ];
@@ -58,7 +53,7 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
   /**
    * {@inheritdoc}
    */
-  public static function value($element, $input = FALSE, FormStateInterface $form_state) {
+  public static function value($element, $input, FormStateInterface $form_state) {
     $return = parent::value($element, $input, $form_state);
 
     // When an element is loaded, crop_rect needs to be set. During a form
@@ -71,8 +66,10 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
       $crop_type = \Drupal::config('focal_point.settings')->get('crop_type');
       $crop = Crop::findCrop($file->getFileUri(), $crop_type);
       if ($crop) {
-        $crop_rect = array_map(function ($item) { return $item['value']; }, $crop->focus_crop_coords->getValue());
-        $return['crop_rect'] = join(',', $crop_rect);
+        $crop_rect = array_map(function ($item) {
+          return $item['value'];
+        }, $crop->focus_crop_coords->getValue());
+        $return['crop_rect'] = implode(',', $crop_rect);
       }
     }
     return $return;
@@ -93,14 +90,18 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
 
     $crop_coords = explode(',', $crop_rect);
     if (
-      $crop_coords[0] >= $crop_coords[2] || // Left is greater than right
-      $crop_coords[1] >= $crop_coords[3] // Upper is greater than lower
+      // Left is greater than right.
+      $crop_coords[0] >= $crop_coords[2] ||
+      // Upper is greater than lower.
+      $crop_coords[1] >= $crop_coords[3]
     ) {
       $form_state->setError($element, new TranslatableMarkup('The first two value need to describe the upper left corner of the crop rectangle.'));
     }
   }
 
   /**
+   * Validation callback.
+   *
    * Validation callback checking for value sanity such as the focal point being
    * inside the crop rectangle and the crop rectangle being inside the image
    * boundaries.
@@ -112,10 +113,14 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
 
     $crop_rect = explode(',', $element['#value']['crop_rect']);
     if (
-      $crop_rect[0] > $element['#value']['width'] || // Left is greater than image width
-      $crop_rect[1] > $element['#value']['height'] || // Upper is greater than image height
-      $crop_rect[2] > $element['#value']['width'] || // Right is greater than image width
-      $crop_rect[3] > $element['#value']['height'] // Lower is greater than image height
+      // Left is greater than image width.
+      $crop_rect[0] > $element['#value']['width'] ||
+      // Upper is greater than image height.
+      $crop_rect[1] > $element['#value']['height'] ||
+      // Right is greater than image width.
+      $crop_rect[2] > $element['#value']['width'] ||
+      // Lower is greater than image height.
+      $crop_rect[3] > $element['#value']['height']
     ) {
       $form_state->setError($element, new TranslatableMarkup('The crop rectangle needs to be within the image boundaries.'));
     }
@@ -128,12 +133,17 @@ class FocalPointFocusImageWidget extends FocalPointImageWidget {
     ];
 
     if (
-      $crop_rect[0] > $real_focal_point[0] || // Focal point is smaller then left
-      $crop_rect[1] > $real_focal_point[1] || // Focal point is smaller then upper
-      $crop_rect[2] < $real_focal_point[0] || // Focal point is greater then right
-      $crop_rect[3] < $real_focal_point[1] // Focal point is greater then lower
+      // Focal point is smaller then left.
+      $crop_rect[0] > $real_focal_point[0] ||
+      // Focal point is smaller then upper.
+      $crop_rect[1] > $real_focal_point[1] ||
+      // Focal point is greater then right.
+      $crop_rect[2] < $real_focal_point[0] ||
+      // Focal point is greater then lower.
+      $crop_rect[3] < $real_focal_point[1]
     ) {
       $form_state->setError($element, new TranslatableMarkup('The focal point needs to be inside the crop rectancle!'));
     }
   }
+
 }

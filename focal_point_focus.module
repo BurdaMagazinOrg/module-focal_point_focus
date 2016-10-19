@@ -1,8 +1,15 @@
 <?php
 
+/**
+ * @file
+ * Integrates focal_point_focus into focal_point.
+ */
+
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -11,7 +18,7 @@ function focal_point_focus_entity_base_field_info(EntityTypeInterface $entity_ty
   $fields = [];
 
   if ('crop' == $entity_type->id()) {
-     $fields['focus_crop_coords'] = BaseFieldDefinition::create('integer')
+    $fields['focus_crop_coords'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Focus Crop Rectangle Coordinates'))
       ->setDescription(t('Corners of the crop rectangle (x1,y1,x2,y2).'))
       ->setCardinality(4);
@@ -43,11 +50,11 @@ function focal_point_focus_field_widget_form_alter(&$element, FormStateInterface
  *
  * Saves the crop rect values for the image file entity about to be saved.
  */
-function focal_point_focus_entity_presave(\Drupal\Core\Entity\EntityInterface $entity) {
+function focal_point_focus_entity_presave(EntityInterface $entity) {
   // Only worry about entities that are fieldable.
-  if ($entity instanceof Drupal\Core\Entity\FieldableEntityInterface) {
+  if ($entity instanceof FieldableEntityInterface) {
     // Loop all the fields and save focal point values for images.
-    foreach ($entity->getFieldDefinitions() as $key => $value) {
+    foreach ($entity->getFieldDefinitions() as $value) {
       if ($value->getType() == 'image' && $entity->hasField($value->getName())) {
         // Loop through all values for this field. Its cardinality might be > 1.
         foreach ($entity->{$value->getName()} as $item) {
